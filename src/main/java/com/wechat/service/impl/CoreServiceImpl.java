@@ -1,8 +1,8 @@
 package com.wechat.service.impl;
 
-import com.wechat.pojo.Article;
-import com.wechat.pojo.NewsMessage;
-import com.wechat.pojo.TextMessage;
+import com.wechat.model.Article;
+import com.wechat.model.NewsMessage;
+import com.wechat.model.TextMessage;
 import com.wechat.service.CoreService;
 import com.wechat.util.MessageUtil;
 import org.slf4j.Logger;
@@ -10,27 +10,30 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Map;
+
 /**
- * Created by 墨殇 on 2017/3/24.
  * 核心服务类
  */
 @Service("coreService")
-public class CoreServiceImpl implements CoreService{
-        private static Logger log = LoggerFactory.getLogger(CoreServiceImpl.class);
+public class CoreServiceImpl implements CoreService {
 
-        /**
-         * 处理微信发来的请求（包括事件的推送）
-         *
-         * @param request
-         * @return
-         */
+    private static Logger log = LoggerFactory.getLogger(CoreServiceImpl.class);
+
+    /**
+     * 处理微信发来的请求（包括事件的推送）
+     *
+     * @param request
+     * @return
+     */
     public  String processRequest(HttpServletRequest request) {
+
         String respMessage = null;
         try {
             // 默认返回的文本消息内容
@@ -61,6 +64,10 @@ public class CoreServiceImpl implements CoreService{
             newsMessage.setFuncFlag(0);
 
             List<Article> articleList = new ArrayList<Article>();
+
+
+            //点击菜单id
+            String EventKey =requestMap.get("EventKey");
             // 接收文本消息内容
             String content = requestMap.get("Content");
             // 自动回复文本消息
@@ -78,9 +85,9 @@ public class CoreServiceImpl implements CoreService{
 
                         case "1": {
                             StringBuffer buffer = new StringBuffer();
-                            buffer.append("您好，我是小8，请回复数字选择服务：").append("\n\n");
+                            buffer.append("开始测试：").append("\n\n");
                             buffer.append("11 可查看测试单图文").append("\n");
-                            buffer.append("12  可测试多图文发送").append("\n");
+                            buffer.append("12  可    测试多图文发送").append("\n");
                             buffer.append("13  可测试网址").append("\n");
 
                             buffer.append("或者您可以尝试发送表情").append("\n\n");
@@ -144,7 +151,7 @@ public class CoreServiceImpl implements CoreService{
                         }
 
                         default: {
-                            respContent = "你好。\n\n回复“1”显示帮助信息";
+                            respContent = "啦啦啦。\n\n回复“1”显示帮助信息";
                             textMessage.setContent(respContent);
                             // 将文本消息对象转换成xml字符串
                             respMessage = MessageUtil.textMessageToXml(textMessage);
@@ -180,6 +187,76 @@ public class CoreServiceImpl implements CoreService{
                 // 将文本消息对象转换成xml字符串
                 respMessage = MessageUtil.textMessageToXml(textMessage);
             }
+
+
+            // 事件推送
+            else if (msgType.equals(MessageUtil.REQ_MESSAGE_TYPE_EVENT)) {
+                // 事件类型
+                String eventType =requestMap.get("Event");
+                // 自定义菜单点击事件
+                if (eventType.equals(MessageUtil.EVENT_TYPE_CLICK)) {
+                    switch (EventKey){
+                        case "11":{
+                            respContent = "这是第一栏第一个";
+                            break;
+                        }
+                        case "12":{
+                            respContent = "这是第一栏第一个";
+                            break;
+                        }
+                        case "21":{
+                            respContent = "这是第二栏第一个";
+                            break;
+                        }
+
+                        default:{
+                            log.error("开发者反馈：EventKey值没找到，它是:"+EventKey);
+                            respContent= "很抱歉，此按键功能正在升级无法使用";
+                        }
+                    }
+                    textMessage.setContent(respContent);
+                    // 将文本消息对象转换成xml字符串
+                    respMessage = MessageUtil.textMessageToXml(textMessage);
+                }
+                else if(eventType.equals(MessageUtil.EVENT_TYPE_VIEW)){
+                    // 对于点击菜单转网页暂时不做推送
+                }
+
+                // 订阅
+                else if (eventType.equals(MessageUtil.EVENT_TYPE_SUBSCRIBE)) {
+                    //测试单图文回复
+                    Article article = new Article();
+                    article.setTitle("谢谢您的关注！");
+                    // 图文消息中可以使用QQ表情、符号表情
+                    article.setDescription("点击图文可以跳转到百度首页");
+                    // 将图片置为空
+                    article.setPicUrl("http://www.sinaimg.cn/dy/slidenews/31_img/2016_38/28380_733695_698372.jpg");
+                    article.setUrl("http://www.baidu.com");
+                    articleList.add(article);
+                    newsMessage.setArticleCount(articleList.size());
+                    newsMessage.setArticles(articleList);
+                    respMessage = MessageUtil.newsMessageToXml(newsMessage);
+                }
+                else if(eventType.equals(MessageUtil.EVENT_TYPE_SCAN)){
+                    //测试单图文回复
+                    Article article = new Article();
+                    article.setTitle("这是已关注用户扫描二维码弹到的界面");
+                    // 图文消息中可以使用QQ表情、符号表情
+                    article.setDescription("点击图文可以跳转到百度首页");
+                    // 将图片置为空
+                    article.setPicUrl("http://www.sinaimg.cn/dy/slidenews/31_img/2016_38/28380_733695_698372.jpg");
+                    article.setUrl("http://www.baidu.com");
+                    articleList.add(article);
+                    newsMessage.setArticleCount(articleList.size());
+                    newsMessage.setArticles(articleList);
+                    respMessage = MessageUtil.newsMessageToXml(newsMessage);
+                }
+                // 取消订阅
+                else if (eventType.equals(MessageUtil.EVENT_TYPE_UNSUBSCRIBE)) {
+                    // TODO 取消订阅后用户再收不到公众号发送的消息，因此不需要回复消息
+                }
+
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -204,5 +281,4 @@ public class CoreServiceImpl implements CoreService{
         }
         return result;
     }
-
 }

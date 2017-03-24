@@ -1,4 +1,4 @@
-package com.wechat.pojo;
+package com.wechat.model;
 
 import java.util.List;
 

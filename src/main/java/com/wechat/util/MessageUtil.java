@@ -11,9 +11,9 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.wechat.pojo.Article;
-import com.wechat.pojo.NewsMessage;
-import com.wechat.pojo.TextMessage;
+import com.wechat.model.Article;
+import com.wechat.model.NewsMessage;
+import com.wechat.model.TextMessage;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
