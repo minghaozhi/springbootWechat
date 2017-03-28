@@ -21,10 +21,10 @@ public class AccessTokenThread {
     private static Logger log = LoggerFactory.getLogger(AccessTokenThread.class);
 
     // 第三方用户唯一凭证
-    public static String appid = "wx1dd7aa8ed2be67e7";
+    public static String appid = "wx84ec0f8340088324";
 
     // 第三方用户唯一凭证密钥
-    public static String appsecret = "ae9d55c58f0d87208f63eb229eb74926";
+    public static String appsecret = "1985ec08620146839cada57e2141fec3";
     // 第三方用户唯一凭证
     public static AccessToken accessToken = null;
 

@@ -48,7 +48,7 @@ public class MenuController {
     }
 
     //创建菜单
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @RequestMapping(value = "/create")
     public int createMenu() {
         // 调用接口获取access_token
         String at = AccessTokenThread.accessToken.getToken();

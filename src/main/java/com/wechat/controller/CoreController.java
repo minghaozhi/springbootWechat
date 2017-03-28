@@ -40,6 +40,7 @@ public class CoreController {
     @RequestMapping(value = "",method = RequestMethod.POST)
     public  String post(HttpServletRequest request){
         String respMessage = coreService.processRequest(request);
+
         return respMessage;
     }
 }
